@@ -1,6 +1,7 @@
 library(tidyverse)
 
 df <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2026/2026-10-06/avocado_oil_bottles.csv')
+df_foods <- read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2026/2026-10-06/avocado_oil_processed_foods.csv")
 
 # vibe check: idk what does this dataset *look* like?
 df |>
@@ -36,4 +37,32 @@ df_long_clustered <- df_long |>
                            "c18_3_linolenic_pct", "campesterol_pct",
                            "stigmasterol_pct"))
 
-# now move to R_graphing.
+
+# examining the processed foods to see whether I can tell what's been adulterated by the lipids
+
+df_foods_long <- df_foods |>
+  select(
+    sample_number,
+    retail_price_usd,
+    authentic,
+    ends_with("pct")
+  ) |>
+  pivot_longer(
+      cols = ends_with("pct"),
+      names_to = "adulterant",
+      values_to = "percent"
+    )
+    
+df_foods_long |>
+  ggplot(aes(x = retail_price_usd, y = percent, group = adulterant,
+             color = authentic)) +
+  geom_point() +
+  facet_wrap(~adulterant)
+
+
+
+df_foods_long_clustered <- df_foods_long |>
+  filter(adulterant %in% c("beta_sitosterol_pct", "c18_1_oleic_pct",
+                           "c18_2_linoleic_pct",
+                           "campesterol_pct",
+                           "stigmasterol_pct"))
