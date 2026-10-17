@@ -44,9 +44,9 @@ df_summary_by_country <- africa |>
   group_by(specificepithet) |>
   summarize(n = n())
 
-# DRAFT MAP of what countries have the most native frog species
-base_plot <- ggplot() +
-  geom_sf(data = df_summary, aes(fill = n)) +
-  scale_fill_paletteer_c("grDevices::Greens 3") 
+# vector of ploidy series of frogs
+# trop, laevis, andrei, ruwenzoriensis 
 
-base_plot
+df_ploidy <- africa |>
+  filter(specificepithet %in% ploidy_series) |>
+  select(iso_a2, name_long, amphib_id, family, genus, specificepithet, geom)
