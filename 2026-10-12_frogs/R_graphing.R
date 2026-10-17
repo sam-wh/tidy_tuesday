@@ -1,8 +1,11 @@
 library(showtext)
 library(patchwork)
+library(ggtext)
 
 font_add_google(name = "League Spartan", family = "league")
 showtext_auto()
+title_font <- "league"
+body_font <- "league"
 
 # DRAFT MAP of what countries have the most native frog species
 base_plot_sp_distribution <- ggplot() +
@@ -22,80 +25,53 @@ frog_mapper <- function(subspecies) {
   working_df <- df_longer |>
     filter(specificepithet == subspecies)
   
-  base_plot <- quick_map(working_df, plot_col = "iso_a2", verbose = FALSE, zoom = "Africa", theme = "Viridis") 
-}
-
-plot_laevis <- frog_mapper("laevis") +
-  labs(title = "Xenopus laevis (4n)") +
-  theme(legend.position = "none",
-        plot.title = element_text(hjust = 0.5, size = 30, margin = margin( 1 , 1 , 0, 1)), 
+  base_plot <- quick_map(working_df, plot_col = "iso_a2", verbose = FALSE, zoom = "Africa", theme = "Viridis") +
+    theme(legend.position = "none",
+        plot.title = element_text(hjust = 0.5, size = 30, margin = margin( 1 , 1 , 15, 1)), 
         title = element_text(family = "league")
   )
+}
+
+plot_laevis <- frog_mapper(ploidy_series[2]) +
+  labs(title = "Xenopus laevis (4n)")
 
 plot_trop <- frog_mapper(ploidy_series[1]) +
-  labs(title = "Xenopus tropicalis (2n)") +
-  theme(legend.position = "none",
-        plot.title = element_text(hjust = 0.5, size = 30, margin = margin( 1 , 1 , 0, 1)), 
-        title = element_text(family = "league")
-  )
+  labs(title = "Xenopus tropicalis (2n)") 
 
 plot_wittei <- frog_mapper(ploidy_series[3]) +
-  labs(title = "Xenopus wittei (8n)") +
-  theme(legend.position = "none",
-        plot.title = element_text(hjust = 0.5, size = 30, margin = margin( 1 , 1 , 0, 1)), 
-        title = element_text(family = "league")
-  )
+  labs(title = "Xenopus wittei (8n)") 
 
 plot_ruw <- frog_mapper(ploidy_series[4]) +
-  labs(title = "Xenopus ruwenzoriensis (12n)") +
-  theme(legend.position = "none",
-        plot.title = element_text(hjust = 0.5, size = 30, margin = margin( 1 , 1 , 0, 1)), 
-        title = element_text(family = "league")
-  )
+  labs(title = "Xenopus ruwenzoriensis (12n)")
 
 
-# cowplotter? I hardly know er --------------------------------------------
-
-base_overplot <- plot_grid(
-  plot_trop, plot_laevis, plot_wittei, plot_ruw,
-  ncol = 2)
-
-labeller <- function(text, fontface, font_size) {
-  ggdraw() +
-    draw_label(
-      text,
-      x = 0,
-      fontface = fontface,
-      fontfamily = "league",
-      size = font_size, 
-      hjust = 0) +
-  theme(
-    plot.margin = margin(0, 0, 0, 0))
-}
-
-title_label <- labeller("Chromosomes", "bold", 50)
-
-title <- ggdraw() +
-  draw_label(
-    "Chromosomes",
-    fontface = 'bold', 
-    x = 0,
-    fontfamily = "league",
-    size = 50,
-    hjust = 0
-    ) +
-  theme(
-    plot.margin = margin(0, 0, 20, 7)
-  )
-
-library(cowplot)
-plot_grid(
-  title, base_overplot,
-  ncol = 1)
+# patchwork --------------------------------------------
+subtitle = "Frogs from the genus *Xenopus* are commonly used in biological research. These frogs are often polyploid, which means that they contain more than two copies of their entire genome, e.g. a dodecaploid ('12n') animal has twelve (!) copies of its genome."
 
 plot_trop + plot_laevis + plot_wittei + plot_ruw +
-  plot_annotation("Representative Xenopus species and their geographic distribution",
-                  caption = "Made by @ssamwh.bsky.social for TidyTuesday 2026 no. 41",
-                  theme = theme(plot.title = element_text(size = 40, family = "league", hjust = 0.5),
-                                plot.caption = element_text(size = 20, family = "league"))
+  plot_annotation(title = "Representative Xenopus species and their geographic distribution",
+                  subtitle = subtitle,
+                  caption = "Made by @ssamwh.bsky.social for TidyTuesday 2026 #41, AmphibiaWeb",
+                  theme = theme(
+                    plot.margin = margin(20,5,5,5),
+                    plot.title = element_textbox_simple(
+                      margin = margin(b = 5, t = 5),
+                      size = 35,
+                      face = "bold",
+                      hjust = 0.5,
+                      halign = 0.5,
+                      lineheight = 0.75,
+                      family = title_font),
+                    plot.subtitle = element_textbox_simple(
+                      margin = margin(b = 10, t = 15),
+                      size = 20,
+                      width = 1,
+                      family = body_font,
+                      lineheight = 0.8
+                    ),
+                    plot.caption = element_textbox_simple(
+                      size = 20,
+                      family = body_font
+                    )
+                  )
   )
