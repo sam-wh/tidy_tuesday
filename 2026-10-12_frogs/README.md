@@ -4,7 +4,7 @@ Because I am a frog scientist this one was exciting for me!
 
 ### The graph
 
-<img src = "frog_plot.png>
+<img src = "frog_plot.png">
 
 ### Things I learned:
 
